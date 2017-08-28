@@ -11,6 +11,10 @@ public class Tank {
 	private int x;
 	private int y;
 	
+	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
+	enum Direction {UP,DOWN,LEFT,RIGHT,LEFT_UP,RIGHT_UP,LEFT_DOWN,RIGHT_DOWN,STOP};
+	private Direction direction = Direction.STOP;
+	
 	public Tank(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -21,24 +25,93 @@ public class Tank {
 		g.setColor(Color.RED);
 		g.fillOval(x, y, SIZE_X, SIZE_Y);
 		g.setColor(c);
+		move ();
 	} 
 	
-	public void keyEvent (KeyEvent e) {
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_UP:
+	private void move () {
+		switch (direction) {
+		case UP:
 			y -= STEP;
 			break;
-		case KeyEvent.VK_DOWN:
+		case DOWN:
 			y += STEP;
 			break;
-		case KeyEvent.VK_RIGHT:
+		case LEFT:
+			x -= STEP; 
+			break;
+		case RIGHT:
 			x += STEP;
 			break;
-		case KeyEvent.VK_LEFT:
+		case LEFT_UP:
 			x -= STEP;
+			y -= STEP;
+			break;
+		case LEFT_DOWN:
+			x -= STEP;
+			y += STEP;
+			break;
+		case RIGHT_UP:
+			x += STEP;
+			y -= STEP;
+			break;
+		case RIGHT_DOWN:
+			x += STEP;
+			y += STEP;
+			break;
+		case STOP:
+			break;
+		}
+	}
+	
+	public void keyPressed (KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_UP:
+			up_pressed = true;
+			break;
+		case KeyEvent.VK_DOWN:
+			down_pressed = true;
+			break;
+		case KeyEvent.VK_RIGHT:
+			right_pressed = true;
+			break;
+		case KeyEvent.VK_LEFT:
+			left_pressed = true;
 			break;
 		default:
 			break;
 		}
+		directionUpdate ();
+	}
+
+	public void keyReleased(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_UP:
+			up_pressed = false;
+			break;
+		case KeyEvent.VK_DOWN:
+			down_pressed = false;
+			break;
+		case KeyEvent.VK_RIGHT:
+			right_pressed = false;
+			break;
+		case KeyEvent.VK_LEFT:
+			left_pressed = false;
+			break;
+		default:
+			break;
+		}
+		directionUpdate ();
+	}
+	
+	private void directionUpdate () {
+		if (up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.UP;
+		else if (!up_pressed && down_pressed && !left_pressed && !right_pressed) direction = Direction.DOWN;
+		else if (!up_pressed && !down_pressed && left_pressed && !right_pressed) direction = Direction.LEFT;
+		else if (!up_pressed && !down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT;
+		else if (up_pressed && !down_pressed && left_pressed && !right_pressed) direction = Direction.LEFT_UP;
+		else if (!up_pressed && down_pressed && left_pressed && !right_pressed) direction = Direction.LEFT_DOWN;
+		else if (up_pressed && !down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_UP;
+		else if (!up_pressed && down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_DOWN;
+		else if (!up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.STOP;
 	}
 }

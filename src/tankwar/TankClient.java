@@ -76,9 +76,11 @@ public class TankClient extends Frame {
 	}
 	
 	private class KeyMonitor extends KeyAdapter {
-
 		public void keyPressed(KeyEvent e) {
-			tank.keyEvent(e);
+			tank.keyPressed(e);
+		}
+		public void keyReleased(KeyEvent e) {
+			tank.keyReleased(e);
 		}
 	}
 	
