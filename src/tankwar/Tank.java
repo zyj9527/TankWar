@@ -16,6 +16,7 @@ public class Tank {
 	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
 	enum Direction {UP,DOWN,LEFT,RIGHT,LEFT_UP,RIGHT_UP,LEFT_DOWN,RIGHT_DOWN,STOP};
 	private Direction direction = Direction.STOP;
+	private Direction ptDirection = Direction.DOWN;
 	
 	public Tank(int x, int y) {
 		this.x = x;
@@ -31,9 +32,41 @@ public class Tank {
 		g.setColor(COLOR);
 		g.fillOval(x, y, SIZE_X, SIZE_Y);
 		g.setColor(c);
+		drawPt (g);
 		move ();
 	} 
 	
+	private void drawPt(Graphics g) {
+		Color c = g.getColor();
+		g.setColor(Color.BLACK);
+		switch (ptDirection) {
+		case UP:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X/2, y);
+			break;
+		case DOWN:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X/2, y+this.SIZE_Y);
+			break;
+		case LEFT:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y + this.SIZE_Y/2);
+			break;
+		case RIGHT:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y + this.SIZE_Y/2);
+			break;
+		case LEFT_UP:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y);
+			break;
+		case LEFT_DOWN:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y + this.SIZE_Y);
+			break;
+		case RIGHT_UP:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y);
+			break;
+		case RIGHT_DOWN:
+			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y + this.SIZE_Y);
+			break;
+		}
+		g.setColor(c);
+	}
 	private void move () {
 		switch (direction) {
 		case UP:
@@ -71,10 +104,9 @@ public class Tank {
 	
 	public void keyPressed (KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_CONTROL:
-			System.out.println("new Missile");
-			tc.setMissile(fire());
-			break;
+		/*case KeyEvent.VK_CONTROL:
+			fire();
+			break;*/
 		case KeyEvent.VK_UP:
 			up_pressed = true;
 			break;
@@ -95,6 +127,9 @@ public class Tank {
 
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
+		case KeyEvent.VK_CONTROL:
+			fire();
+			break;
 		case KeyEvent.VK_UP:
 			up_pressed = false;
 			break;
@@ -123,11 +158,14 @@ public class Tank {
 		else if (up_pressed && !down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_UP;
 		else if (!up_pressed && down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_DOWN;
 		else if (!up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.STOP;
+		
+		if (direction != Direction.STOP)
+			ptDirection = direction;
 	}
 
-	private Missile fire () {
+	private void fire () {
 		int m_x = this.x + this.SIZE_X/2 - Missile.getSizeX()/2;
 		int m_y = this.y + this.SIZE_Y/2 - Missile.getSizeY()/2;
-		return new Missile(m_x, m_y, direction);
+		tc.setMissileList(new Missile(m_x, m_y, ptDirection));
 	}
 }

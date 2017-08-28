@@ -5,6 +5,8 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class TankClient extends Frame {
 	private final int START_X = 200;
@@ -18,9 +20,10 @@ public class TankClient extends Frame {
 	
 	private Tank tank = new Tank (x, y, this);
 	private Missile missile = null;
+	private List<Missile> missile_List = new LinkedList<Missile>();
 	
-	public void setMissile(Missile missile) {
-		this.missile = missile;
+	public void setMissileList(Missile missile) {
+		this.missile_List.add(missile);
 	}
 
 	//单例模式
@@ -69,8 +72,11 @@ public class TankClient extends Frame {
 	@Override
 	public void paint(Graphics g) {
 		tank.draw(g);
-		if (missile != null)
-			missile.draw(g);
+		if (!missile_List.isEmpty()) {
+			for (int i = 0; i < missile_List.size(); ++i) {
+				missile_List.get(i).draw(g);
+			}
+		}
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
