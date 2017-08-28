@@ -5,11 +5,13 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
 public class Tank {
-	private final int SIZE_X = 20;
-	private final int SIZE_Y = 20;
-	private final int STEP = 10;
+	private static final int SIZE_X = 26;
+	private static final int SIZE_Y = 26;
+	private static final int STEP = 8;
+	private static final Color COLOR = Color.RED;
 	private int x;
 	private int y;
+	private TankClient tc;
 	
 	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
 	enum Direction {UP,DOWN,LEFT,RIGHT,LEFT_UP,RIGHT_UP,LEFT_DOWN,RIGHT_DOWN,STOP};
@@ -19,10 +21,14 @@ public class Tank {
 		this.x = x;
 		this.y = y;
 	}
+	public Tank(int x, int y, TankClient tc) {
+		this (x, y);
+		this.tc = tc;
+	}
 	
 	public void draw (Graphics g) {
 		Color c = g.getColor();
-		g.setColor(Color.RED);
+		g.setColor(COLOR);
 		g.fillOval(x, y, SIZE_X, SIZE_Y);
 		g.setColor(c);
 		move ();
@@ -65,6 +71,10 @@ public class Tank {
 	
 	public void keyPressed (KeyEvent e) {
 		switch (e.getKeyCode()) {
+		case KeyEvent.VK_CONTROL:
+			System.out.println("new Missile");
+			tc.setMissile(fire());
+			break;
 		case KeyEvent.VK_UP:
 			up_pressed = true;
 			break;
@@ -113,5 +123,11 @@ public class Tank {
 		else if (up_pressed && !down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_UP;
 		else if (!up_pressed && down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_DOWN;
 		else if (!up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.STOP;
+	}
+
+	private Missile fire () {
+		int m_x = this.x + this.SIZE_X/2 - Missile.getSizeX()/2;
+		int m_y = this.y + this.SIZE_Y/2 - Missile.getSizeY()/2;
+		return new Missile(m_x, m_y, direction);
 	}
 }

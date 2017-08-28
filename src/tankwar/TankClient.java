@@ -16,8 +16,13 @@ public class TankClient extends Frame {
 	private int x = 50;
 	private int y = 50;
 	
-	private Tank tank = new Tank (x, y);
+	private Tank tank = new Tank (x, y, this);
+	private Missile missile = null;
 	
+	public void setMissile(Missile missile) {
+		this.missile = missile;
+	}
+
 	//单例模式
 	private TankClient () {};
 	private static TankClient tc = null;
@@ -63,10 +68,9 @@ public class TankClient extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
-		Color c = g.getColor();
-		g.setColor(Color.black);
 		tank.draw(g);
-		g.setColor(c);
+		if (missile != null)
+			missile.draw(g);
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
