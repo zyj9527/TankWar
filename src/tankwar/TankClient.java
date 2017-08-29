@@ -9,21 +9,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TankClient extends Frame {
-	private final int START_X = 200;
-	private final int START_Y = 200;
-	private final int WIDTH = 800;
-	private final int HEIGHT = 600;
-	private final int FRAME_INTERVAL = 50;
-	private final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
+	public static final int START_X = 200;
+	public static final int START_Y = 200;
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 600;
+	public static final int FRAME_INTERVAL = 50;
+	public static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
 	private int x = 50;
 	private int y = 50;
 	
 	private Tank tank = new Tank (x, y, this);
-	private Missile missile = null;
 	private List<Missile> missile_List = new LinkedList<Missile>();
 	
 	public void setMissileList(Missile missile) {
 		this.missile_List.add(missile);
+	}
+	
+	public void removeMissileList(Missile missile) {
+		if (this.missile_List.contains(missile))
+			this.missile_List.remove(missile);
 	}
 
 	//单例模式
@@ -38,6 +42,7 @@ public class TankClient extends Frame {
 	
 	
 	public void launch () {
+		this.setTitle("Tank War");
 		this.setLocation(START_X, START_Y);
 		this.setSize(WIDTH, HEIGHT);
 		this.setResizable(false);
@@ -77,12 +82,20 @@ public class TankClient extends Frame {
 				missile_List.get(i).draw(g);
 			}
 		}
+		drawString (g);
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	private void drawString (Graphics g) {
+		Color c = g.getColor();
+		g.setColor(Color.BLACK);
+		g.drawString("missile count:"+missile_List.size(), 30, 30);
+		g.setColor(c);
 	}
 	
 	private class KeyMonitor extends KeyAdapter {

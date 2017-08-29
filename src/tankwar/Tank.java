@@ -5,10 +5,10 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
 public class Tank {
-	private static final int SIZE_X = 26;
-	private static final int SIZE_Y = 26;
-	private static final int STEP = 8;
-	private static final Color COLOR = Color.RED;
+	public static final int SIZE_X = 26;
+	public static final int SIZE_Y = 26;
+	public static final int STEP = 8;
+	public static final Color COLOR = Color.RED;
 	private int x;
 	private int y;
 	private TankClient tc;
@@ -41,28 +41,30 @@ public class Tank {
 		g.setColor(Color.BLACK);
 		switch (ptDirection) {
 		case UP:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X/2, y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x + Tank.SIZE_X/2, y);
 			break;
 		case DOWN:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X/2, y+this.SIZE_Y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x + Tank.SIZE_X/2, y+Tank.SIZE_Y);
 			break;
 		case LEFT:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y + this.SIZE_Y/2);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x, y + Tank.SIZE_Y/2);
 			break;
 		case RIGHT:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y + this.SIZE_Y/2);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x + Tank.SIZE_X, y + Tank.SIZE_Y/2);
 			break;
 		case LEFT_UP:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x, y);
 			break;
 		case LEFT_DOWN:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x, y + this.SIZE_Y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x, y + Tank.SIZE_Y);
 			break;
 		case RIGHT_UP:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x + Tank.SIZE_X, y);
 			break;
 		case RIGHT_DOWN:
-			g.drawLine(x + this.SIZE_X/2, y + this.SIZE_Y/2, x + this.SIZE_X, y + this.SIZE_Y);
+			g.drawLine(x + Tank.SIZE_X/2, y + Tank.SIZE_Y/2, x + Tank.SIZE_X, y + Tank.SIZE_Y);
+			break;
+		default:
 			break;
 		}
 		g.setColor(c);
@@ -100,6 +102,14 @@ public class Tank {
 		case STOP:
 			break;
 		}
+		if (x < 0)
+			x = 0;
+		if (y < 0)
+			y = 0;
+		if (x + Tank.SIZE_X > TankClient.WIDTH)
+			x = TankClient.WIDTH - Tank.SIZE_X;
+		if (y + Tank.SIZE_Y > TankClient.HEIGHT)
+			y = TankClient.HEIGHT - Tank.SIZE_Y;
 	}
 	
 	public void keyPressed (KeyEvent e) {
@@ -164,8 +174,8 @@ public class Tank {
 	}
 
 	private void fire () {
-		int m_x = this.x + this.SIZE_X/2 - Missile.getSizeX()/2;
-		int m_y = this.y + this.SIZE_Y/2 - Missile.getSizeY()/2;
-		tc.setMissileList(new Missile(m_x, m_y, ptDirection));
+		int m_x = this.x + Tank.SIZE_X/2 - Missile.SIZE_X/2;
+		int m_y = this.y + Tank.SIZE_Y/2 - Missile.SIZE_Y/2;
+		tc.setMissileList(new Missile(m_x, m_y, ptDirection,tc));
 	}
 }

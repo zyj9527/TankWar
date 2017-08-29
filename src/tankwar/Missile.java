@@ -6,27 +6,21 @@ import java.awt.Graphics;
 import tankwar.Tank.Direction;
 
 public class Missile {
-	private static final int SIZE_X = 10;
-	private static final int SIZE_Y = 10;
-	private static final int STEP = 15;
-	private static final Color COLOR = Color.BLACK;
+	public static final int SIZE_X = 10;
+	public static final int SIZE_Y = 10;
+	public static final int STEP = 15;
+	public static final Color COLOR = Color.BLACK;
 	private int x;
 	private int y;
-	
-	public static int getSizeX() {
-		return SIZE_X;
-	}
-
-	public static int getSizeY() {
-		return SIZE_Y;
-	}
+	private TankClient tc;
 
 	private Tank.Direction direction;
 	
-	public Missile(int x, int y, Direction direction) {
+	public Missile(int x, int y, Direction direction, TankClient tc) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
+		this.tc = tc;
 	}
 
 	public void draw (Graphics g) {
@@ -67,6 +61,11 @@ public class Missile {
 			x += STEP;
 			y += STEP;
 			break;
+		default:
+			break;
+		}
+		if (x < 0 || y < 0 || x > tc.WIDTH || y > tc.HEIGHT) {
+			tc.removeMissileList(this);
 		}
 	}
 }
