@@ -9,16 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TankClient extends Frame {
-	public static final int START_X = 200;
-	public static final int START_Y = 200;
-	public static final int WIDTH = 800;
-	public static final int HEIGHT = 600;
+	public static final int START_X = 200,START_Y = 200;
+	public static final int WIDTH = 800, HEIGHT = 600;
 	public static final int FRAME_INTERVAL = 50;
 	public static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
-	private int x = 50;
-	private int y = 50;
+	private int myTankStartX = 50, myTankStartY = 50;
+	private int robotTankStartX = 200, robotTankStartY = 50;
 	
-	private Tank tank = new Tank (x, y, this);
+	private Tank myTank = new Tank (myTankStartX, myTankStartY, true, this);
+	private Tank robotTank = new Tank (robotTankStartX, robotTankStartY, false, this);
 	private List<Missile> missile_List = new LinkedList<Missile>();
 	
 	public void setMissileList(Missile missile) {
@@ -76,10 +75,16 @@ public class TankClient extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
-		tank.draw(g);
+		myTank.draw(g);
+		robotTank.draw(g);
 		if (!missile_List.isEmpty()) {
 			for (int i = 0; i < missile_List.size(); ++i) {
-				missile_List.get(i).draw(g);
+				Missile m = missile_List.get (i);
+				if (m.hitTank(robotTank)) {
+					robotTank.setLive(false);
+					missile_List.remove(m);
+				} else
+					m.draw(g);
 			}
 		}
 		drawString (g);
@@ -100,10 +105,10 @@ public class TankClient extends Frame {
 	
 	private class KeyMonitor extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
-			tank.keyPressed(e);
+			myTank.keyPressed(e);
 		}
 		public void keyReleased(KeyEvent e) {
-			tank.keyReleased(e);
+			myTank.keyReleased(e);
 		}
 	}
 	

@@ -2,15 +2,16 @@ package tankwar;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 public class Tank {
-	public static final int SIZE_X = 26;
-	public static final int SIZE_Y = 26;
+	public static final int SIZE_X = 26, SIZE_Y = 26;
 	public static final int STEP = 8;
-	public static final Color COLOR = Color.RED;
-	private int x;
-	private int y;
+	public static final Color GOODCOLOR = Color.BLUE, BADCOLOR = Color.RED;
+	private int x, y;
+	private boolean isGood;
+	private boolean isLive;
 	private TankClient tc;
 	
 	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
@@ -22,14 +23,28 @@ public class Tank {
 		this.x = x;
 		this.y = y;
 	}
-	public Tank(int x, int y, TankClient tc) {
+	public Tank(int x, int y, boolean good, TankClient tc) {
 		this (x, y);
 		this.tc = tc;
+		this.isGood = good;
+		this.isLive = true;
+	}
+	
+	public boolean isLive() {
+		return isLive;
+	}
+	public void setLive(boolean isLive) {
+		this.isLive = isLive;
 	}
 	
 	public void draw (Graphics g) {
+		if (!this.isLive)
+			return;
 		Color c = g.getColor();
-		g.setColor(COLOR);
+		if (isGood)
+			g.setColor(GOODCOLOR);
+		else
+			g.setColor(BADCOLOR);
 		g.fillOval(x, y, SIZE_X, SIZE_Y);
 		g.setColor(c);
 		drawPt (g);
@@ -177,5 +192,9 @@ public class Tank {
 		int m_x = this.x + Tank.SIZE_X/2 - Missile.SIZE_X/2;
 		int m_y = this.y + Tank.SIZE_Y/2 - Missile.SIZE_Y/2;
 		tc.setMissileList(new Missile(m_x, m_y, ptDirection,tc));
+	}
+	
+	public Rectangle getRect () {
+		return new Rectangle(x, y, SIZE_X, SIZE_Y);
 	}
 }
