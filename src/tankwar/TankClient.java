@@ -18,15 +18,23 @@ public class TankClient extends Frame {
 	
 	private Tank myTank = new Tank (myTankStartX, myTankStartY, true, this);
 	private Tank robotTank = new Tank (robotTankStartX, robotTankStartY, false, this);
-	private List<Missile> missile_List = new LinkedList<Missile>();
+	private List<Missile> missileList = new LinkedList<Missile>();
+	private List<Explosion> explosionList = new LinkedList<Explosion> ();
 	
-	public void setMissileList(Missile missile) {
-		this.missile_List.add(missile);
+	public void addMissile(Missile missile) {
+		this.missileList.add(missile);
+	}
+	public void removeMissile(Missile missile) {
+		if (this.missileList.contains(missile))
+			this.missileList.remove(missile);
 	}
 	
-	public void removeMissileList(Missile missile) {
-		if (this.missile_List.contains(missile))
-			this.missile_List.remove(missile);
+	public void addExplosion(Explosion e) {
+		this.explosionList.add(e);
+	}
+	public void removeExplosion(Explosion e) {
+		if (this.explosionList.contains(e))
+			this.explosionList.remove(e);
 	}
 
 	//单例模式
@@ -75,19 +83,29 @@ public class TankClient extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
+		drawString (g);
 		myTank.draw(g);
 		robotTank.draw(g);
-		if (!missile_List.isEmpty()) {
-			for (int i = 0; i < missile_List.size(); ++i) {
-				Missile m = missile_List.get (i);
+		if (!missileList.isEmpty()) {
+			for (int i = 0; i < missileList.size(); ++i) {
+				Missile m = missileList.get (i);
 				if (m.hitTank(robotTank)) {
 					robotTank.setLive(false);
-					missile_List.remove(m);
+					missileList.remove(m);
 				} else
 					m.draw(g);
 			}
 		}
-		drawString (g);
+		if (!explosionList.isEmpty()) {
+			for (int i = 0; i < explosionList.size(); ++i) {
+				Explosion e = explosionList.get(i);
+				if (e.isLive())
+					e.draw(g);
+				else {
+					explosionList.remove(e);
+				}
+			}
+		}
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
@@ -99,7 +117,8 @@ public class TankClient extends Frame {
 	private void drawString (Graphics g) {
 		Color c = g.getColor();
 		g.setColor(Color.BLACK);
-		g.drawString("missile count:"+missile_List.size(), 30, 30);
+		g.drawString("missile count:"+missileList.size(), 20, 10);
+		g.drawString("explosion count:"+explosionList.size(), 20, 30);
 		g.setColor(c);
 	}
 	

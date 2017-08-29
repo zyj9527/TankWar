@@ -10,6 +10,7 @@ public class Tank {
 	public static final int STEP = 8;
 	public static final Color GOODCOLOR = Color.BLUE, BADCOLOR = Color.RED;
 	private int x, y;
+
 	private boolean isGood;
 	private boolean isLive;
 	private TankClient tc;
@@ -30,6 +31,12 @@ public class Tank {
 		this.isLive = true;
 	}
 	
+	public int getX() {
+		return x;
+	}
+	public int getY() {
+		return y;
+	}
 	public boolean isLive() {
 		return isLive;
 	}
@@ -191,7 +198,7 @@ public class Tank {
 	private void fire () {
 		int m_x = this.x + Tank.SIZE_X/2 - Missile.SIZE_X/2;
 		int m_y = this.y + Tank.SIZE_Y/2 - Missile.SIZE_Y/2;
-		tc.setMissileList(new Missile(m_x, m_y, ptDirection,tc));
+		tc.addMissile(new Missile(m_x, m_y, ptDirection,tc));
 	}
 	
 	public Rectangle getRect () {

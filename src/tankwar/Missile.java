@@ -68,7 +68,7 @@ public class Missile {
 			break;
 		}
 		if (x < 0 || y < 0 || x > TankClient.WIDTH || y > TankClient.HEIGHT) {
-			tc.removeMissileList(this);
+			tc.removeMissile(this);
 		}
 	}
 	
@@ -79,6 +79,7 @@ public class Missile {
 	public boolean hitTank (Tank t) {
 		if (t.isLive()) {
 			if (getRect().intersects(t.getRect())) {
+				tc.addExplosion(new Explosion(t.getX()+Tank.SIZE_X/2, t.getY()+Tank.SIZE_Y/2, tc));
 				return true;
 			}
 		}
