@@ -15,9 +15,11 @@ public class TankClient extends Frame {
 	public static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
 	private int myTankStartX = 50, myTankStartY = 50;
 	private int robotTankStartX = 200, robotTankStartY = 50;
+	public static final int ROBOTTANK_NUM = 10;
 	
 	private Tank myTank = new Tank (myTankStartX, myTankStartY, true, this);
-	private Tank robotTank = new Tank (robotTankStartX, robotTankStartY, false, this);
+	//private Tank robotTank = new Tank (robotTankStartX, robotTankStartY, false, this);
+	private List<Tank> robotTanks = new LinkedList<Tank> ();
 	private List<Missile> missileList = new LinkedList<Missile>();
 	private List<Explosion> explosionList = new LinkedList<Explosion> ();
 	
@@ -49,6 +51,10 @@ public class TankClient extends Frame {
 	
 	
 	public void launch () {
+		robotTanks.add(myTank);
+		for (int i = 0; i < ROBOTTANK_NUM; ++i) {
+			robotTanks.add(new Tank(100+40*i , 50, false, this));
+		}
 		this.setTitle("Tank War");
 		this.setLocation(START_X, START_Y);
 		this.setSize(WIDTH, HEIGHT);
@@ -84,28 +90,9 @@ public class TankClient extends Frame {
 	@Override
 	public void paint(Graphics g) {
 		drawString (g);
-		myTank.draw(g);
-		robotTank.draw(g);
-		if (!missileList.isEmpty()) {
-			for (int i = 0; i < missileList.size(); ++i) {
-				Missile m = missileList.get (i);
-				if (m.hitTank(robotTank)) {
-					robotTank.setLive(false);
-					missileList.remove(m);
-				} else
-					m.draw(g);
-			}
-		}
-		if (!explosionList.isEmpty()) {
-			for (int i = 0; i < explosionList.size(); ++i) {
-				Explosion e = explosionList.get(i);
-				if (e.isLive())
-					e.draw(g);
-				else {
-					explosionList.remove(e);
-				}
-			}
-		}
+		drawTank (g);
+		drawMissile (g);
+		drawExplosion (g);
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
@@ -118,8 +105,41 @@ public class TankClient extends Frame {
 		Color c = g.getColor();
 		g.setColor(Color.BLACK);
 		g.drawString("missile count:"+missileList.size(), 20, 10);
-		g.drawString("explosion count:"+explosionList.size(), 20, 30);
+		g.drawString("explosion count:"+explosionList.size(), 20, 20);
+		g.drawString("robotTanks count:"+robotTanks.size(), 20, 30);
 		g.setColor(c);
+	}
+	
+	private void drawTank (Graphics g) {
+		//myTank.draw(g);
+		for (int i = 0; i < robotTanks.size(); ++i) {
+			robotTanks.get(i).draw(g);
+		}
+	}
+	
+	private void drawMissile (Graphics g) {
+		if (!missileList.isEmpty()) {
+			for (int i = 0; i < missileList.size(); ++i) {
+				Missile m = missileList.get (i);
+				if (m.hitRobotTanks(robotTanks)) {
+					missileList.remove(m);
+				} else
+					m.draw(g);
+			}
+		}
+	}
+	
+	private void drawExplosion (Graphics g) {
+		if (!explosionList.isEmpty()) {
+			for (int i = 0; i < explosionList.size(); ++i) {
+				Explosion e = explosionList.get(i);
+				if (e.isLive())
+					e.draw(g);
+				else {
+					explosionList.remove(e);
+				}
+			}
+		}
 	}
 	
 	private class KeyMonitor extends KeyAdapter {

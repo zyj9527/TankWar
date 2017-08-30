@@ -4,15 +4,18 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 
 public class Tank {
 	public static final int SIZE_X = 26, SIZE_Y = 26;
-	public static final int STEP = 8;
+	public static final int STEP = 6;
 	public static final Color GOODCOLOR = Color.BLUE, BADCOLOR = Color.RED;
 	private int x, y;
 
 	private boolean isGood;
 	private boolean isLive;
+	private Random random = new Random ();
+	private int robotStep = random.nextInt(12) + 3;
 	private TankClient tc;
 	
 	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
@@ -29,6 +32,10 @@ public class Tank {
 		this.tc = tc;
 		this.isGood = good;
 		this.isLive = true;
+		if (!isGood) {
+			Direction[] dir = Direction.values(); 
+			direction = dir[random.nextInt(dir.length)];
+		}
 	}
 	
 	public int getX() {
@@ -36,6 +43,9 @@ public class Tank {
 	}
 	public int getY() {
 		return y;
+	}
+	public boolean isGood() {
+		return isGood;
 	}
 	public boolean isLive() {
 		return isLive;
@@ -59,6 +69,8 @@ public class Tank {
 	} 
 	
 	private void drawPt(Graphics g) {
+		if (direction != Direction.STOP)
+			ptDirection = direction;
 		Color c = g.getColor();
 		g.setColor(Color.BLACK);
 		switch (ptDirection) {
@@ -124,6 +136,18 @@ public class Tank {
 		case STOP:
 			break;
 		}
+		
+		if (!isGood) {
+			if (random.nextInt(40) > 38)
+				fire ();
+			robotStep--;
+			Direction [] dirs = Direction.values();
+			if (robotStep == 0) {
+				direction = dirs[random.nextInt(dirs.length)];
+				robotStep = random.nextInt(10) + 3;
+			}
+		}
+		
 		if (x < 0)
 			x = 0;
 		if (y < 0)
@@ -191,14 +215,16 @@ public class Tank {
 		else if (!up_pressed && down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_DOWN;
 		else if (!up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.STOP;
 		
-		if (direction != Direction.STOP)
-			ptDirection = direction;
+//		if (direction != Direction.STOP)
+//			ptDirection = direction;
 	}
 
 	private void fire () {
+		if (!isLive)
+			return ;
 		int m_x = this.x + Tank.SIZE_X/2 - Missile.SIZE_X/2;
 		int m_y = this.y + Tank.SIZE_Y/2 - Missile.SIZE_Y/2;
-		tc.addMissile(new Missile(m_x, m_y, ptDirection,tc));
+		tc.addMissile(new Missile(m_x, m_y, isGood, ptDirection,tc));
 	}
 	
 	public Rectangle getRect () {
