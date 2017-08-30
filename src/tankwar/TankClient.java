@@ -106,6 +106,11 @@ public class TankClient extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
+		if (robotTanks.size() <= 1) {
+			for (int i = 0; i < ROBOTTANK_NUM; ++i) {
+				robotTanks.add(new Tank(100+40*i , 50, false, this));
+			}
+		}
 		drawString (g);
 		drawTank (g);
 		drawMissile (g);
@@ -209,7 +214,10 @@ public class TankClient extends Frame {
 			b_restart.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
+					myTank.setLive(true);
+					myTank.setLife(Tank.FULL_BLOOD);
+					myTank.setDirection(Tank.Direction.STOP);
+					setVisible(false);
 				}
 			});
 			b_quit.addActionListener(new ActionListener() {				

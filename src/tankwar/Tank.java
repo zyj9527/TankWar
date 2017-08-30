@@ -49,6 +49,9 @@ public class Tank {
 	public void setLife (int life){
 		this.life = life;
 	}
+	public void setDirection (Direction dir){
+		this.direction = dir;
+	}
 	public boolean isGood() {
 		return isGood;
 	}
