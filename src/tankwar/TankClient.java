@@ -1,9 +1,15 @@
 package tankwar;
 
+import java.awt.Button;
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Label;
+import java.awt.Panel;
 import java.awt.event.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,16 +19,27 @@ public class TankClient extends Frame {
 	public static final int WIDTH = 800, HEIGHT = 600;
 	public static final int FRAME_INTERVAL = 50;
 	public static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
-	private int myTankStartX = 50, myTankStartY = 50;
-	private int robotTankStartX = 200, robotTankStartY = 50;
+	public static final int WIDTH_WALL = 50, HEIGHT_WALL = 300;
+	private int myTankStartX = WIDTH/2, myTankStartY = HEIGHT - Tank.SIZE_Y;
 	public static final int ROBOTTANK_NUM = 10;
 	
+	private QuitDialog messageDialog = new QuitDialog(this, "Game Over", true);
+	
+	private Wall wall = new Wall (WIDTH/2 - WIDTH_WALL/2,HEIGHT/2 - HEIGHT_WALL/2, WIDTH_WALL, HEIGHT_WALL, this);
 	private Tank myTank = new Tank (myTankStartX, myTankStartY, true, this);
-	//private Tank robotTank = new Tank (robotTankStartX, robotTankStartY, false, this);
 	private List<Tank> robotTanks = new LinkedList<Tank> ();
 	private List<Missile> missileList = new LinkedList<Missile>();
 	private List<Explosion> explosionList = new LinkedList<Explosion> ();
 	
+	public Wall getWall() {
+		return wall;
+	}
+	public Tank getMyTank() {
+		return myTank;
+	}
+	public List<Tank> getRobotTanks() {
+		return robotTanks;
+	}
 	public void addMissile(Missile missile) {
 		this.missileList.add(missile);
 	}
@@ -93,12 +110,15 @@ public class TankClient extends Frame {
 		drawTank (g);
 		drawMissile (g);
 		drawExplosion (g);
+		wall.draw(g);
 		repaint ();
 		try {
 			Thread.sleep(FRAME_INTERVAL);
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		} 
+		if (myTank.isLive() == false)
+			messageDialog.setVisible(true);
 	}
 	
 	private void drawString (Graphics g) {
@@ -107,6 +127,7 @@ public class TankClient extends Frame {
 		g.drawString("missile count:"+missileList.size(), 20, 10);
 		g.drawString("explosion count:"+explosionList.size(), 20, 20);
 		g.drawString("robotTanks count:"+robotTanks.size(), 20, 30);
+		g.drawString("My Tank life:"+myTank.life, 20, 40);
 		g.setColor(c);
 	}
 	
@@ -150,7 +171,7 @@ public class TankClient extends Frame {
 			myTank.keyReleased(e);
 		}
 	}
-	
+
 /*	
 	private class PaintThread implements Runnable {
 		@Override
@@ -166,7 +187,40 @@ public class TankClient extends Frame {
 		}
 	}
 */
-
+	private class QuitDialog extends Dialog {
+		private static final int WIDTH_DIALOG = 300, HEIGHT_DIALOG = 100;
+		Label l_over = new Label ("Game Over");
+		Button b_restart = new Button ("Restart");
+		Button b_quit = new Button ("Quit");
+		Panel p = new Panel (new FlowLayout(2));
+		QuitDialog (TankClient tc, String s, boolean b) {
+			super (tc, s, b);
+			setBounds(TankClient.START_X + TankClient.WIDTH/2 - WIDTH_DIALOG/2 , TankClient.START_Y + TankClient.HEIGHT/2 - HEIGHT_DIALOG/2, WIDTH_DIALOG, HEIGHT_DIALOG);
+			this.addWindowListener(new WindowAdapter () {
+				public void windowClosing(WindowEvent e) {
+					System.exit(0);
+				}
+			});
+			p.add(b_restart);
+			p.add(b_quit);
+			setLayout(new GridLayout(2, 1));
+			add(l_over);
+			add(p);
+			b_restart.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+				}
+			});
+			b_quit.addActionListener(new ActionListener() {				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.exit(0);
+				}
+			});
+		}
+	}
+	
 	public static void main(String[] args) {
 		TankClient tc = TankClient.getInstance();
 		tc.launch();

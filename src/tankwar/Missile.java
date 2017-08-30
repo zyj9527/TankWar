@@ -11,6 +11,7 @@ public class Missile {
 	public static final int SIZE_X = 10;
 	public static final int SIZE_Y = 10;
 	public static final int STEP = 10;
+	public static final Color BAD_COLOR = Color.BLACK, GOOD_COLOR = Color.cyan;
 	private Color color;
 	private int x, y;
 	private boolean isLive;
@@ -28,9 +29,9 @@ public class Missile {
 		this.isGood = good;
 		isLive = true;
 		if (isGood)
-			color = Color.green;
+			color = GOOD_COLOR;
 		else
-			color = Color.BLACK;
+			color = BAD_COLOR;
 			
 	}
 
@@ -75,7 +76,7 @@ public class Missile {
 		default:
 			break;
 		}
-		if (x < 0 || y < 0 || x > TankClient.WIDTH || y > TankClient.HEIGHT) {
+		if (x < 0 || y < 0 || x > TankClient.WIDTH || y > TankClient.HEIGHT || collideWall()) {
 			tc.removeMissile(this);
 		}
 	}
@@ -87,7 +88,15 @@ public class Missile {
 	private boolean hitTank (Tank t) {
 		if (t.isLive()) {
 			if (getRect().intersects(t.getRect()) && (isGood != t.isGood())) {
-				tc.addExplosion(new Explosion(t.getX()+Tank.SIZE_X/2, t.getY()+Tank.SIZE_Y/2, tc));
+				if (t.isGood()) {
+					t.life -= 20;
+					if (t.life <= 0) {
+						t.setLive(false);
+						tc.addExplosion(new Explosion(t.getX()+Tank.SIZE_X/2, t.getY()+Tank.SIZE_Y/2, tc));
+					}
+				} else {
+					tc.addExplosion(new Explosion(t.getX()+Tank.SIZE_X/2, t.getY()+Tank.SIZE_Y/2, tc));
+				}
 				return true;
 			}
 		}
@@ -96,11 +105,21 @@ public class Missile {
 	
 	public boolean hitRobotTanks (List<Tank> robottanks) {
 		for (int i = 0; i < robottanks.size(); ++i) {
-			if (hitTank (robottanks.get(i))) {
-				robottanks.get(i).setLive(false);
-				robottanks.remove(i);
+			Tank t = robottanks.get(i);
+			if (hitTank (t)) {
+				if (!t.isGood()) {
+					robottanks.get(i).setLive(false);
+					robottanks.remove(i);
+				}
 				return true;
 			}
+		}
+		return false;
+	}
+	
+	public boolean collideWall () {
+		if (getRect().intersects(tc.getWall().getRect())) {
+			return true;
 		}
 		return false;
 	}

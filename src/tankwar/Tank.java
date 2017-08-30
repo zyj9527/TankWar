@@ -4,13 +4,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Random;
 
 public class Tank {
 	public static final int SIZE_X = 26, SIZE_Y = 26;
-	public static final int STEP = 6;
+	public static final int STEP = 6, FULL_BLOOD = 100;
 	public static final Color GOODCOLOR = Color.BLUE, BADCOLOR = Color.RED;
-	private int x, y;
+	private int x, y, old_x, old_y;
+	public int life = FULL_BLOOD;
 
 	private boolean isGood;
 	private boolean isLive;
@@ -44,6 +46,9 @@ public class Tank {
 	public int getY() {
 		return y;
 	}
+	public void setLife (int life){
+		this.life = life;
+	}
 	public boolean isGood() {
 		return isGood;
 	}
@@ -65,8 +70,24 @@ public class Tank {
 		g.fillOval(x, y, SIZE_X, SIZE_Y);
 		g.setColor(c);
 		drawPt (g);
+		if (isGood)
+			drawLife (g);
 		move ();
 	} 
+	
+	private void drawLife (Graphics g) {
+		Color c = g.getColor();
+		g.setColor(Color.GREEN);
+		g.drawRect(x, y - 10, SIZE_X , 10);
+		if (life > FULL_BLOOD*2/3)
+			g.setColor(Color.GREEN);
+		else if (life > FULL_BLOOD/3)
+			g.setColor(Color.YELLOW);
+		else
+			g.setColor(Color.RED);
+		g.fillRect(x, y - 10, life * SIZE_X/ FULL_BLOOD , 10);
+		g.setColor(c);
+	}
 	
 	private void drawPt(Graphics g) {
 		if (direction != Direction.STOP)
@@ -104,6 +125,7 @@ public class Tank {
 		g.setColor(c);
 	}
 	private void move () {
+		old_x = x; old_y = y;
 		switch (direction) {
 		case UP:
 			y -= STEP;
@@ -156,6 +178,12 @@ public class Tank {
 			x = TankClient.WIDTH - Tank.SIZE_X;
 		if (y + Tank.SIZE_Y > TankClient.HEIGHT)
 			y = TankClient.HEIGHT - Tank.SIZE_Y;
+		
+		if ((collideWall() && !isGood) || coolideTank()) {
+			x = old_x;
+			y = old_y;
+		}
+		
 	}
 	
 	public void keyPressed (KeyEvent e) {
@@ -185,6 +213,9 @@ public class Tank {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_CONTROL:
 			fire();
+			break;
+		case KeyEvent.VK_A:
+			fire_super();
 			break;
 		case KeyEvent.VK_UP:
 			up_pressed = false;
@@ -227,7 +258,34 @@ public class Tank {
 		tc.addMissile(new Missile(m_x, m_y, isGood, ptDirection,tc));
 	}
 	
+	private void fire_super () {
+		if (!isLive)
+			return ;
+		int m_x = this.x + Tank.SIZE_X/2 - Missile.SIZE_X/2;
+		int m_y = this.y + Tank.SIZE_Y/2 - Missile.SIZE_Y/2;
+		Direction[] dirs = Direction.values();
+		for (int i = 0; i < dirs.length - 1; i++) {
+			tc.addMissile(new Missile(m_x, m_y,isGood, dirs[i],tc));
+		}
+	}
+	
 	public Rectangle getRect () {
 		return new Rectangle(x, y, SIZE_X, SIZE_Y);
+	}
+	
+	public boolean collideWall () {
+		if (getRect().intersects(tc.getWall().getRect())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean coolideTank () {
+		List <Tank> listTanks = tc.getRobotTanks();
+		for (int i = 0; i < listTanks.size();i++) {
+			if (getRect().intersects(listTanks.get(i).getRect()) && !listTanks.get(i).equals(this))
+				return true;
+		}
+		return false;
 	}
 }
