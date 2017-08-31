@@ -122,8 +122,8 @@ public class TankClient extends Frame {
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		} 
-		if (myTank.isLive() == false)
-			messageDialog.setVisible(true);
+//		if (myTank.isLive() == false)
+//			messageDialog.setVisible(true);
 	}
 	
 	private void drawString (Graphics g) {
@@ -133,6 +133,9 @@ public class TankClient extends Frame {
 		g.drawString("explosion count:"+explosionList.size(), 20, 20);
 		g.drawString("robotTanks count:"+robotTanks.size(), 20, 30);
 		g.drawString("My Tank life:"+myTank.life, 20, 40);
+		g.drawString("F2: Restart", WIDTH - 100, 10);
+		g.drawString("A: Super fire", WIDTH - 100, 20);
+		//g.drawString("My Tank status:"+myTank.direction, 20, 50);
 		g.setColor(c);
 	}
 	
@@ -215,7 +218,8 @@ public class TankClient extends Frame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					myTank.setLive(true);
-					myTank.setLife(Tank.FULL_BLOOD);
+					//myTank.setLife(Tank.FULL_BLOOD);
+					myTank.setLife(20);
 					myTank.setDirection(Tank.Direction.STOP);
 					setVisible(false);
 				}

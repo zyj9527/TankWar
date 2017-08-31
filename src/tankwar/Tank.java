@@ -22,7 +22,7 @@ public class Tank {
 	
 	private boolean up_pressed = false, down_pressed = false, left_pressed = false, right_pressed = false;
 	enum Direction {UP,DOWN,LEFT,RIGHT,LEFT_UP,RIGHT_UP,LEFT_DOWN,RIGHT_DOWN,STOP};
-	private Direction direction = Direction.STOP;
+	public Direction direction = Direction.STOP;
 	private Direction ptDirection = Direction.DOWN;
 	
 	public Tank(int x, int y) {
@@ -214,6 +214,12 @@ public class Tank {
 
 	public void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
+		case KeyEvent.VK_F2:
+			if (isGood && !isLive) {
+				isLive = true;
+				life = FULL_BLOOD;
+			}
+			break;
 		case KeyEvent.VK_CONTROL:
 			fire();
 			break;
@@ -248,7 +254,6 @@ public class Tank {
 		else if (up_pressed && !down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_UP;
 		else if (!up_pressed && down_pressed && !left_pressed && right_pressed) direction = Direction.RIGHT_DOWN;
 		else if (!up_pressed && !down_pressed && !left_pressed && !right_pressed) direction = Direction.STOP;
-		
 //		if (direction != Direction.STOP)
 //			ptDirection = direction;
 	}
